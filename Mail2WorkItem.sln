@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mail2WorkItem.ConsoleApp", "Mail2WorkItem.ConsoleApp\Mail2WorkItem.ConsoleApp.csproj", "{EBFCC67E-71C5-4361-B9BA-5C0E8C119173}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mail2WorkItem.Core", "Mail2WorkItem.Core\Mail2WorkItem.Core.csproj", "{3C1E0504-D44C-4038-9BDD-B17D3C8D467A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{15CCD0AD-7A6E-4788-882D-79DF7A8A6807}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		VersionInfo.cs = VersionInfo.cs
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EBFCC67E-71C5-4361-B9BA-5C0E8C119173}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBFCC67E-71C5-4361-B9BA-5C0E8C119173}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBFCC67E-71C5-4361-B9BA-5C0E8C119173}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBFCC67E-71C5-4361-B9BA-5C0E8C119173}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C1E0504-D44C-4038-9BDD-B17D3C8D467A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C1E0504-D44C-4038-9BDD-B17D3C8D467A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C1E0504-D44C-4038-9BDD-B17D3C8D467A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C1E0504-D44C-4038-9BDD-B17D3C8D467A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
