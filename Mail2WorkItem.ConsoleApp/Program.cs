@@ -23,6 +23,9 @@ namespace Mail2WorkItem.ConsoleApp
             config.TFS.WorkItemType = Settings.Default.TFS_WorkItemType;
             config.Smtp.Hostname = Settings.Default.SMTP_Hostname;
             config.Smtp.Port = Settings.Default.SMTP_Port;
+            config.Smtp.UseSsl = Settings.Default.SMTP_UseSsl;
+            config.Smtp.Username = Settings.Default.SMTP_Username;
+            config.Smtp.Password = Settings.Default.SMTP_Password;
             config.Smtp.From = Settings.Default.SMTP_From;
 
             var engine = new Engine(config);
