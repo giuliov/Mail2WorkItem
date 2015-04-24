@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Mail;
 using System.IO;
+using SmartFormat;
 
 namespace Mail2WorkItem.Core
 {
@@ -33,15 +34,19 @@ namespace Mail2WorkItem.Core
                         tempFolder);
                 var messages = picker.ReadAll();
 
-                var tfs = new TfsFacade(
-                        this.logger,
-                        new Uri(configuration.TFS.CollectionUrl), configuration.TFS.ProjectName,
-                        configuration.TFS.WorkItemType);
-                foreach (var mail in messages)
+                if (messages.Count > 0)
                 {
-                    int workItemId = tfs.AddWorkItem(mail);
-                    SendConfirmation(mail, workItemId);
-                }//for
+                    var tfs = new TfsFacade(
+                            this.logger,
+                            new Uri(configuration.TFS.CollectionUrl), configuration.TFS.ProjectName,
+                            configuration.TFS.WorkItemType);
+                    foreach (var mail in messages)
+                    {
+                        int workItemId = tfs.AddWorkItem(mail);
+                        var model = PrepareConfirmationModel(tfs, mail, workItemId);
+                        SendConfirmation(mail.From, model);
+                    }//for
+                }//if
             }
             catch (Exception e)
             {
@@ -54,21 +59,29 @@ namespace Mail2WorkItem.Core
             }//try
         }
 
-        private void SendConfirmation(MailMessage mail, int workItemId)
+        private ConfirmationModel PrepareConfirmationModel(TfsFacade tfs, MailMessage mail, int workItemId)
         {
-            // TODO make customization easier
-            var buf = new StringBuilder();
-            buf.AppendFormat("{0} #{1} has been recorded on your behalf"
-                , configuration.TFS.WorkItemType
-                , workItemId
-                );
-            buf.AppendLine();
+            var model = new ConfirmationModel()
+            {
+                WorkItemType = configuration.TFS.WorkItemType,
+                WorkItemId = workItemId,
+                WorkItemUrl = tfs.GetWorkItemUrl(workItemId),
+                Requester = mail.From.DisplayName,
+                OriginalSubject = mail.Subject,
+            };
+            return model;
+        }
+
+        private void SendConfirmation(OpenPop.Mime.Header.RfcMailAddress fromAddress, ConfirmationModel model)
+        {
+            logger.ComposingConfirmationMessage();
 
             var message = new System.Net.Mail.MailMessage();
-            message.From = new MailAddress(configuration.Smtp.From);
-            message.To.Add(new MailAddress(mail.From.Address, mail.From.DisplayName));
-            message.Subject = "Request received";
-            message.Body = buf.ToString();
+            message.From = new MailAddress(configuration.Smtp.From, configuration.Confirmation.Sender);
+            message.To.Add(new MailAddress(fromAddress.Address, fromAddress.DisplayName));
+            message.Subject = Smart.Format(configuration.Confirmation.Title, model);
+            message.IsBodyHtml = true;
+            message.Body = Smart.Format(configuration.Confirmation.Body, model);
 
             var smtp = new SmtpClient(configuration.Smtp.Hostname, configuration.Smtp.Port);
             smtp.EnableSsl = configuration.Smtp.UseSsl;
@@ -76,12 +89,23 @@ namespace Mail2WorkItem.Core
 
             try
             {
+                logger.SendingConfirmationMessageTo(fromAddress.Address);
                 smtp.Send(message);
+                logger.ConfirmationMessageSentTo(fromAddress.Address);
             }
             catch (Exception e)
             {
                 logger.FailToSendConfirmationMessage(message, e);
-            }
+            }//try
         }
+    }
+
+    class ConfirmationModel
+    {
+        public string WorkItemType { get; set; }
+        public int WorkItemId { get; set; }
+        public string WorkItemUrl { get; set; }
+        public string Requester { get; set; }
+        public string OriginalSubject { get; set; }
     }
 }

@@ -43,5 +43,11 @@ namespace Mail2WorkItem.Core
         void RemovingTemporaryFolder(string tempFolder);
 
         void UnexpectedError(Exception e);
+
+        void ComposingConfirmationMessage();
+
+        void SendingConfirmationMessageTo(string p);
+
+        void ConfirmationMessageSentTo(string p);
     }
 }

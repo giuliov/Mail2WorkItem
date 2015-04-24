@@ -124,6 +124,21 @@ namespace Mail2WorkItem.ConsoleApp
             Log(LogLevel.Information, "Saved work item #{0}", workItem.Id);
         }
 
+        public void ComposingConfirmationMessage()
+        {
+            Log(LogLevel.Verbose, "Composing confirmation message");
+        }
+
+        public void SendingConfirmationMessageTo(string fromAddress)
+        {
+            Log(LogLevel.Verbose, "Sending confirmation message to '{0}'", fromAddress);
+        }
+
+        public void ConfirmationMessageSentTo(string fromAddress)
+        {
+            Log(LogLevel.Information, "Confirmation message sent to '{0}'", fromAddress);
+        }
+
         public void FailToSendConfirmationMessage(System.Net.Mail.MailMessage message, Exception e)
         {
             Log(LogLevel.Critical, "Failed to send confirmation message to '{0}'\nException: {1}", message.Subject, e.Message);

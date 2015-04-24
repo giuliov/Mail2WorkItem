@@ -27,6 +27,9 @@ namespace Mail2WorkItem.ConsoleApp
             config.Smtp.Username = Settings.Default.SMTP_Username;
             config.Smtp.Password = Settings.Default.SMTP_Password;
             config.Smtp.From = Settings.Default.SMTP_From;
+            config.Confirmation.Title = Settings.Default.Confirmation_Title;
+            config.Confirmation.Body = Settings.Default.Confirmation_Body;
+            config.Confirmation.Sender = Settings.Default.Confirmation_Sender;
 
             var logger = new ConsoleEventLogger(Settings.Default.LogLevel);
 

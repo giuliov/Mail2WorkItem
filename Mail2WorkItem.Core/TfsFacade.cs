@@ -66,10 +66,11 @@ AND  [System.AttachedFileCount] >= 1"
             workItem.Open();
             workItem.Title = mail.Subject;
             workItem.Description = mail.Body;
+            // HACK this is to avoid pocessing the same mail twice
             var link = new Hyperlink("mailto:" + mail.MessageId);
             workItem.Links.Add(link);
 
-            Attachment originalMailAsAttachment = new Attachment(mail.LocalDumpFile, "Original email as attachment");
+            Attachment originalMailAsAttachment = new Attachment(mail.LocalDumpFile, "Original email");
             workItem.Attachments.Add(originalMailAsAttachment);
 
             foreach (var mailAttachment in mail.Attachments)
@@ -90,6 +91,12 @@ AND  [System.AttachedFileCount] >= 1"
             }
 
             return workItem.Id;
+        }
+
+        public string GetWorkItemUrl(int id)
+        {
+            return string.Format("{0}/{1}/_workitems/edit/{2}",
+                this.tfs.Uri.AbsoluteUri, this.projectName, id);
         }
     }
 }

@@ -45,7 +45,17 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="LogLevel" Type="Mail2WorkItem.Core.LogLevel" Scope="Application">
-      <Value Profile="(Default)">Warning</Value>
+      <Value Profile="(Default)">Normal</Value>
+    </Setting>
+    <Setting Name="Confirmation_Title" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">{WorkItemType} #{WorkItemId} created for '{OriginalSubject}'</Value>
+    </Setting>
+    <Setting Name="Confirmation_Body" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Dear {Requester},&lt;br/&gt;
+{WorkItemType} &lt;a href="{WorkItemUrl}"&gt;#{WorkItemId}&lt;/a&gt; has been created per you '{OriginalSubject}' mail.</Value>
+    </Setting>
+    <Setting Name="Confirmation_Sender" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Team Foundation Server</Value>
     </Setting>
   </Settings>
 </SettingsFile>

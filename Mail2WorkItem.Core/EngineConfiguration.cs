@@ -37,17 +37,26 @@ namespace Mail2WorkItem.Core
         }
     }
 
+    public class ConfirmationMessageConfiguration
+    {
+        public string Sender { get; set; }
+        public string Title { get; set; }
+        public string Body { get; set; }
+    }
+
     public class EngineConfiguration
     {
         public Pop3Configuration Pop3 { get; protected set; }
         public TfsConfiguration TFS { get; protected set; }
         public SmtpConfiguration Smtp { get; protected set; }
+        public ConfirmationMessageConfiguration Confirmation { get; protected set; }
 
         public EngineConfiguration()
         {
             this.Pop3 = new Pop3Configuration();
             this.TFS = new TfsConfiguration();
             this.Smtp = new SmtpConfiguration();
+            this.Confirmation = new ConfirmationMessageConfiguration();
         }
     }
 }

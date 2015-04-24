@@ -151,10 +151,38 @@ namespace Mail2WorkItem.ConsoleApp.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Warning")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Normal")]
         public global::Mail2WorkItem.Core.LogLevel LogLevel {
             get {
                 return ((global::Mail2WorkItem.Core.LogLevel)(this["LogLevel"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("{WorkItemType} #{WorkItemId} created for \'{OriginalSubject}\'")]
+        public string Confirmation_Title {
+            get {
+                return ((string)(this["Confirmation_Title"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Dear {Requester},<br/>\r\n{WorkItemType} <a href=\"{WorkItemUrl}\">#{WorkItemId}</a> " +
+            "has been created per you \'{OriginalSubject}\' mail.")]
+        public string Confirmation_Body {
+            get {
+                return ((string)(this["Confirmation_Body"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Team Foundation Server")]
+        public string Confirmation_Sender {
+            get {
+                return ((string)(this["Confirmation_Sender"]));
             }
         }
     }
