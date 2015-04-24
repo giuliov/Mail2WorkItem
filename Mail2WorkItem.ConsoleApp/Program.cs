@@ -28,7 +28,9 @@ namespace Mail2WorkItem.ConsoleApp
             config.Smtp.Password = Settings.Default.SMTP_Password;
             config.Smtp.From = Settings.Default.SMTP_From;
 
-            var engine = new Engine(config);
+            var logger = new ConsoleEventLogger(Settings.Default.LogLevel);
+
+            var engine = new Engine(config, logger);
             engine.Run();
         }
     }

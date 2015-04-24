@@ -11,6 +11,7 @@ namespace Mail2WorkItem.Core
 {
     public class MailPicker
     {
+        ILogEvents logger;
         string hostname;
         int port;
         bool useSsl;
@@ -18,8 +19,9 @@ namespace Mail2WorkItem.Core
         string password;
         string tempFolder;
 
-        public MailPicker(string hostname, int port, bool useSsl, string username, string password, string tempFolder)
+        public MailPicker(ILogEvents logger, string hostname, int port, bool useSsl, string username, string password, string tempFolder)
         {
+            this.logger = logger;
             this.hostname = hostname;
             this.port = port;
             this.useSsl = useSsl;
@@ -28,38 +30,48 @@ namespace Mail2WorkItem.Core
             this.tempFolder = tempFolder;
         }
 
-        public IList<MailMessage> ReadAll(string tempFolder)
+        public IList<MailMessage> ReadAll()
         {
             var result = new List<MailMessage>();
+
+            logger.ConnectingToPop3Server(this.hostname);
 
             using (Pop3Client client = new Pop3Client())
             {
                 client.Connect(hostname, port, useSsl);
                 client.Authenticate(username, password);
 
+                logger.ConnectedToPop3Server(this.hostname);
+
                 try
                 {
-                    int num = client.GetMessageCount();
+                    int numMessages = client.GetMessageCount();
+                    logger.FoundMessages(numMessages);
 
-                    for (int i = 1; i <= num; i++)
+                    for (int messageNo = 1; messageNo <= numMessages; messageNo++)
                     {
-                        var pop3mail = client.GetMessage(i);
+                        logger.ReadingMessage(messageNo);
+                        var pop3mail = client.GetMessage(messageNo);
+                        logger.MessageRead(pop3mail);
 
                         var message = MakeMessage(pop3mail);
                         SaveAttachments(pop3mail, message);
 
                         result.Add(message);
 #if !DEBUG
-                        client.DeleteMessage(i);
+                        logger.DeletingMessage(messageNo);
+                        client.DeleteMessage(messageNo);
 #endif
                     }//for
 
+                    logger.DisconnectingFromPop3Server(this.hostname);
                     // also forces message deletion
                     client.Disconnect();
+                    logger.DisconnectedFromPop3Server(this.hostname);
                 }
                 catch (Exception e)
                 {
-                    //TODO log
+                    logger.ErrorWhileReadingFromPop3Server(this.hostname, e);
                 }//try
 
                 return result;
@@ -75,9 +87,12 @@ namespace Mail2WorkItem.Core
                 body = pop3mail.FindFirstPlainTextVersion();
             }
 
-            string tempFile = Path.ChangeExtension(Path.Combine(tempFolder, pop3mail.Headers.MessageId), ".eml");
+            // .elm is usually associated with default email client
+            string tempFile = Path.Combine(tempFolder, pop3mail.Headers.MessageId) + ".eml";
+            logger.SavingIncomingMailTo(tempFile);
             var fi = new FileInfo(tempFile);
             pop3mail.Save(fi);
+            logger.SavedIncomingMailTo(tempFile);
 
             var message = new MailMessage()
             {
@@ -98,8 +113,10 @@ namespace Mail2WorkItem.Core
             foreach (var pop3attachment in pop3mail.FindAllAttachments())
             {
                 string tempFile = Path.Combine(mailTempFolder, pop3attachment.FileName);
+                logger.SavingIncomingMailAttachmentTo(tempFile);
                 var fi = new FileInfo(tempFile);
                 pop3attachment.Save(fi);
+                logger.SavedIncomingMailAttachmentTo(tempFile);
                 var attachment = new MailAttachment()
                 {
                     Name = pop3attachment.FileName,

@@ -10,19 +10,35 @@ namespace Mail2WorkItem.Core
 {
     public class TfsFacade
     {
+        ILogEvents logger;
         private TfsTeamProjectCollection tfs;
         private WorkItemStore workItemStore;
         private string projectName;
+        private string workItemTypeName;
 
-        public TfsFacade(Uri tfsCollectionUri, string projectName)
+        public TfsFacade(ILogEvents logger, Uri tfsCollectionUri, string projectName, string workItemTypeName)
         {
+            this.logger = logger;
             this.projectName = projectName;
+            this.workItemTypeName = workItemTypeName;
 
             this.tfs = new TfsTeamProjectCollection(tfsCollectionUri);
+            logger.ConnectingToTfs(tfsCollectionUri);
+            this.tfs.EnsureAuthenticated();
             this.workItemStore = tfs.GetService<WorkItemStore>();
+            logger.ConnectedToTfs(tfsCollectionUri);
+
+            if (!workItemStore.Projects.Contains(this.projectName))
+            {
+                logger.TfsProjectNotFound(this.projectName);
+            }
+            if (!workItemStore.Projects[projectName].WorkItemTypes.Contains(workItemTypeName))
+            {
+                logger.TfsWorkItemTypeNotFound(projectName, workItemTypeName);
+            }
         }
 
-        public int AddWorkItem(MailMessage mail, string workItemTypeName)
+        public int AddWorkItem(MailMessage mail)
         {
             var workItemType = workItemStore.Projects[projectName].WorkItemTypes[workItemTypeName];
 
@@ -41,7 +57,8 @@ AND  [System.AttachedFileCount] >= 1"
 
             if (queryResult.Count > 0)
             {
-                //LOG
+                int existingId = queryResult[0].Id;
+                logger.AWorkItemAlreadyExistsFor(existingId, mail);
                 return 0;
             }
 
@@ -61,7 +78,16 @@ AND  [System.AttachedFileCount] >= 1"
                 workItem.Attachments.Add(newAttachment);
             }//for
 
-            workItem.Save();
+            if (!workItem.IsValid())
+            {
+                logger.InvalidWorkItem(workItem);
+            }
+            else
+            {
+                logger.SavingWorkItem(workItem);
+                workItem.Save();
+                logger.WorkItemSaved(workItem);
+            }
 
             return workItem.Id;
         }

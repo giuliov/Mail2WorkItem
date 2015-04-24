@@ -148,5 +148,14 @@ namespace Mail2WorkItem.ConsoleApp.Properties {
                 return ((string)(this["SMTP_Password"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Warning")]
+        public global::Mail2WorkItem.Core.LogLevel LogLevel {
+            get {
+                return ((global::Mail2WorkItem.Core.LogLevel)(this["LogLevel"]));
+            }
+        }
     }
 }

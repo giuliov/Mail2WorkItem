@@ -11,10 +11,12 @@ namespace Mail2WorkItem.Core
     public class Engine
     {
         EngineConfiguration configuration;
+        ILogEvents logger;
 
-        public Engine(EngineConfiguration configuration)
+        public Engine(EngineConfiguration configuration, ILogEvents logger)
         {
             this.configuration = configuration;
+            this.logger = logger;
         }
 
         public void Run()
@@ -25,27 +27,36 @@ namespace Mail2WorkItem.Core
             try
             {
                 var picker = new MailPicker(
+                        this.logger,
                         configuration.Pop3.Hostname, configuration.Pop3.Port, configuration.Pop3.UseSsl,
                         configuration.Pop3.Username, configuration.Pop3.Password,
                         tempFolder);
-                var messages = picker.ReadAll(tempFolder);
+                var messages = picker.ReadAll();
 
-                var tfs = new TfsFacade(new Uri(configuration.TFS.CollectionUrl), configuration.TFS.ProjectName);
+                var tfs = new TfsFacade(
+                        this.logger,
+                        new Uri(configuration.TFS.CollectionUrl), configuration.TFS.ProjectName,
+                        configuration.TFS.WorkItemType);
                 foreach (var mail in messages)
                 {
-                    int workItemId = tfs.AddWorkItem(mail, configuration.TFS.WorkItemType);
+                    int workItemId = tfs.AddWorkItem(mail);
                     SendConfirmation(mail, workItemId);
                 }//for
             }
+            catch (Exception e)
+            {
+                logger.UnexpectedError(e);
+            }
             finally
             {
+                logger.RemovingTemporaryFolder(tempFolder);
                 Directory.Delete(tempFolder, true);
             }//try
         }
 
         private void SendConfirmation(MailMessage mail, int workItemId)
         {
-            // TODO make easier customization
+            // TODO make customization easier
             var buf = new StringBuilder();
             buf.AppendFormat("{0} #{1} has been recorded on your behalf"
                 , configuration.TFS.WorkItemType
@@ -63,7 +74,14 @@ namespace Mail2WorkItem.Core
             smtp.EnableSsl = configuration.Smtp.UseSsl;
             smtp.Credentials = new System.Net.NetworkCredential(configuration.Smtp.Username, configuration.Smtp.Password);
 
-            smtp.Send(message);
+            try
+            {
+                smtp.Send(message);
+            }
+            catch (Exception e)
+            {
+                logger.FailToSendConfirmationMessage(message, e);
+            }
         }
     }
 }

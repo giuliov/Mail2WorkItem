@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Engine.cs" />
     <Compile Include="EngineConfiguration.cs" />
+    <Compile Include="ILogEvents.cs" />
     <Compile Include="MailMessage.cs" />
     <Compile Include="MailPicker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
