@@ -2,6 +2,8 @@ Console app that monitors a mailbox using POP3 and creates WorkItems in Team Fou
 
 # Usage
 
+[![Join the chat at https://gitter.im/giuliov/Mail2WorkItem](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/giuliov/Mail2WorkItem?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 The tool has no command line option, configuration is taken from `Mail2WorkItem.ConsoleApp.exe.config` file.
 
 It reads all available messages from the POP3 server and creates or update a TFS work item. An email is sent back to the original sender to inform of a successful operation.
